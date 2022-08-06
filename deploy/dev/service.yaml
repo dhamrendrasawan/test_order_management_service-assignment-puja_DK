@@ -1,0 +1,21 @@
+# Schema found here -> https://pages.github.azc.ext.hp.com/Tropos/docs/references/service-yaml/service-yaml-overview/
+
+environment:
+  SPRING_PROFILES_ACTIVE: prod
+
+healthEndpoint:
+  path: "/service-quickstart/health"
+  
+  
+externalSecrets:
+-name: FLYWAY_USER     
+  secret: dev/gekko/rds 
+  key: username
+  
+- name: FLYWAY_PASSWORD     
+  secret: dev/gekko/rds 
+  key: password 
+
+- name: FLYWAY_URL
+  secret: dev/gekko/secrets
+  key: order_management_flyway_url

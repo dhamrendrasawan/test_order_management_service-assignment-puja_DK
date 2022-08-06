@@ -1,0 +1,62 @@
+# Pipeline summary
+# This is triggered both by pull requests and by merges to master branch.
+# Some of the stages/jobs/scripts below are conditionally ran depending on how the pipeline was triggered.
+
+resources:
+  repositories:
+    - repository: codeway
+      type: githubenterprise
+      name: codeway/templates
+      endpoint: ghe
+
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  branches:
+    include:
+    - master
+pr:
+  branches:
+    include:
+    - master
+
+# Variable groups including configurations and secrets you want to use in this pipeline (Pipeline -> Library in ADO UI)
+variables:
+  - group: Defaults
+
+stages:
+  - template: templates/tropos-java-service-v1.yaml@codeway
+    parameters:
+     
+      isMavenBuild: true
+      mavenServiceConnections: nexus
+      dockerRegistryConnection: harbor
+      flywayMigrationDockerfile: 'flywaymigrations.Dockerfile'
+      serviceName: oder_management-controller
+      imageName: gekko/oder_management-controller
+
+      dockerfileTestParams:
+        internalContainerPort: 8080 
+        pingRoute: 'health' 
+        appPingGate: false
+
+      anchoreScan: true
+      anchoreGate: false
+
+      # Unit Test & SonarQube
+      unitTestParams:
+        testArgs: -Dgroups=UnitTest # filter just unit tests
+        sonarScan: false
+        sonarProjectPrefix: $(SonarProjectPrefix)
+
+      componentTestParams:
+        testArgs: -Dgroups=ComponentTest # filter just component tests
+        sonarScan: false
+        sonarProjectPrefix: $(SonarProjectPrefix)
+
+#      integrationTestParams:
+#        testArgs: -Dgroups=IntegrationTest -Dspring.profiles.active=integration # filter 'narrow' integration tests
+#        dockerEnvVars: -e SPRING_PROFILES_ACTIVE=integration
+#        composeFile: docker-compose.yaml
+#        dbMigrationEnvVars: -e MONGO_URL=mongodb://mongo:27017 -e MONGO_DATABASE=service-quickstart-local
+#

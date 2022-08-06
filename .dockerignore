@@ -1,0 +1,11 @@
+**/.idea
+**/.mvn
+**/*.iml
+**/*.md
+**/*.iml
+**/.dockerignore
+**/Dockerfile
+**/Dockerfile.develop
+**/docker-compose.yml
+**/docker-compose.*.yml
+**/.gradle
