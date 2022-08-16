@@ -41,16 +41,7 @@
 		</dependencies>
 	</dependencyManagement>
 	<repositories>
-		<repository>
-			<id>nexus-it</id>
-			<url>https://nexus-int.corp.hpicloud.net/repository/gekko-central/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
+		
 		<repository>
 			<id>central</id>
 			<name>Central Repository</name>
@@ -114,11 +105,7 @@
 			<version>${springfox-swagger2.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.hp.tropos</groupId>
-			<artifactId>logging</artifactId>
-			<version>0.1.6</version>
-		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
