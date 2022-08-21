@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ import com.hp.gekko.ordermanagement.exceptions.ErrorCategory;
 import com.hp.gekko.ordermanagement.repository.CustomerRepository;
 import com.hp.gekko.ordermanagement.repository.OrderRepository;
 import com.hp.gekko.ordermanagement.repository.ProductRepository;
+import com.hp.gekko.ordermanagement.util.MyUtils;
 import com.hp.gekko.ordermanagement.util.ValidationUtils;
 
 @Service
@@ -40,6 +40,9 @@ public class OrderService {
 	 */
 
 	public OrderDto getAllOrders() {
+		
+		 String result = MyUtils.getWelcomeMessage("duke", false);
+		 System.out.println("result= "+result);
 		List<Order> order = orderRepository.findAll();
 		return convertEntityToDto(order);
 	}

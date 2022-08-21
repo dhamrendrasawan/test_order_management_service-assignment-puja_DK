@@ -1,5 +1,6 @@
 package com.hp.gekko.ordermanagement.component;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 import java.text.ParseException;
@@ -9,13 +10,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,20 +33,22 @@ import com.hp.gekko.ordermanagement.entity.Product;
 import com.hp.gekko.ordermanagement.repository.CustomerRepository;
 import com.hp.gekko.ordermanagement.repository.OrderRepository;
 import com.hp.gekko.ordermanagement.service.OrderService;
+import com.hp.gekko.ordermanagement.util.MyUtils;
 
 @SpringBootTest
-
+@ExtendWith(MockitoExtension.class)
+@Tag("ComponentTest")
 public class OrderServiceTest {
 
 	private static final String orderId = "ORDERID12";
 
 	@InjectMocks
-
+	@Spy
 	private OrderService service;
 	@Mock
 	private OrderRepository orderRepository;
 	@Mock
-	private CustomerRepository  customerRepository;
+	private CustomerRepository customerRepository;
 
 	@Test
 	public void TestDeleteMethod() {
@@ -59,21 +64,31 @@ public class OrderServiceTest {
 	}
 
 	@Test
-
 	public void testGetByOrderIdOrderWithInValidCase() throws ParseException {
+
 		String temp = "25/07/2022";
 		Date temp1 = new SimpleDateFormat("dd/MM/yyyy").parse(temp);
-
 		Order order = new Order(1L, "1", "AB2", temp1, temp1, null, null);
+		/*Mockito.when(orderRepository.findByOrderId(Mockito.anyString())).thenReturn(Optional.ofNullable(null));
+		Order ordernew = service.getOrdersById(orderId);
+		Assertions.assertNull(ordernew);*/
+		
+		Mockito.when(orderRepository.findByOrderId(Mockito.anyString())).thenReturn(Optional.ofNullable(order));
+		// Order response = service.getOrdersById(orderId);
+		// Assertions.assertNotNull(response);
+		service.getOrdersById(orderId);
+		Mockito.verify(service).getOrdersById(orderId);
+		
+		//verify(subscriptionCreationServiceImplMock).createSubscriptionRequest(orderEntity, subscriptionEntities,
+			//	contractAccountResponse, transactionId, operation, 0);
+	}
+	@Test
+	public void testGetByOrderIdOrderWithNullValidCase() throws ParseException {
 
 		Mockito.when(orderRepository.findByOrderId(Mockito.anyString())).thenReturn(Optional.ofNullable(null));
-		Order ordernew = service.getOrdersById(orderId);
-
+		Order ordernew = service.getOrdersById(orderId);		
+		Mockito.verify(service).getOrdersById(orderId);
 		Assertions.assertNull(ordernew);
-
-		Mockito.when(orderRepository.findByOrderId(Mockito.anyString())).thenReturn(Optional.ofNullable(order));
-		Order response = service.getOrdersById(orderId);
-		Assertions.assertNotNull(response);
 	}
 
 	@Test
@@ -104,36 +119,45 @@ public class OrderServiceTest {
 	@Test
 	public void testGetAllOrders() throws ParseException {
 
-		Customer cust = Customer.builder().customerId(1L).build();
-		List<Order> orderList = new ArrayList<>();
-		Order order = Order.builder().orderId("orderId").code("code").customer(cust).build();
-		orderList.add(order);
-		Mockito.when(orderRepository.findAll()).thenReturn(orderList);
-		OrderDto response = service.getAllOrders();
-		Assertions.assertNotNull(response);
+//		MyUtils.getWelcomeMessage("duke", true);
+		try (MockedStatic<MyUtils> mockedStatic = Mockito.mockStatic(MyUtils.class)) {
+
+			mockedStatic.when(() -> MyUtils.getWelcomeMessage("duke", false)).thenReturn("Hello duke");
+
+			String result = MyUtils.getWelcomeMessage("duke", false);
+
+			assertEquals("Hello duke", result);
+			Customer cust = Customer.builder().customerId(1L).build();
+			List<Order> orderList = new ArrayList<>();
+			Order order = Order.builder().orderId("orderId").code("code").customer(cust).build();
+			orderList.add(order);
+			Mockito.when(orderRepository.findAll()).thenReturn(orderList);
+			OrderDto response = service.getAllOrders();
+			Assertions.assertNotNull(response);
+		}
 	}
 
 	@Test
 	public void testcreateOrder() throws ParseException, JsonProcessingException {
 		String temp = "25/07/2022";
 		Date temp1 = new SimpleDateFormat("dd/MM/yyyy").parse(temp);
-	
-		//Order order = Order.builder().code("as").orderId("1").customer(null).build();
+
+		// Order order = Order.builder().code("as").orderId("1").customer(null).build();
 		Customer customer = Customer.builder().userName("abc").build();
 		ObjectMapper obj = new ObjectMapper();
 
 		String cust = obj.writeValueAsString(customer);
 		Order order = new Order(1L, "1", "AB2", temp1, temp1, null, customer);
 
-		//Product prod = new Product(1L, "Pook", 22, 4.5, temp1, temp1, order);
+		// Product prod = new Product(1L, "Pook", 22, 4.5, temp1, temp1, order);
 		List<Product> prodList = new ArrayList<>();
-		//prodList.add(prod);
+		// prodList.add(prod);
 		Mockito.when(orderRepository.findByOrderId(Mockito.anyString())).thenReturn(Optional.ofNullable(order));
-		//service.saveCustosaveOrder(order);
+		// service.saveCustosaveOrder(order);
 		Mockito.when(customerRepository.findByUserName(Mockito.anyString())).thenReturn(Optional.ofNullable(customer));
-		
-		//.saveCustosaveOrder(order);
-		
+
+		// .saveCustosaveOrder(order);
+
 		Assertions.assertNotNull(order);
 
 	}

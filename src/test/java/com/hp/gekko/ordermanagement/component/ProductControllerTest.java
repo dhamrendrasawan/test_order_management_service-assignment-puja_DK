@@ -1,6 +1,5 @@
 package com.hp.gekko.ordermanagement.component;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,11 +42,11 @@ public class ProductControllerTest {
 			
 		//	Mockito.when(service.getByProductId(productId)).thenReturn(prodDto);
 			ResponseEntity<Object> response = productController.getOrderPathVar(productId);
-			Assert.assertEquals(HttpStatus.OK, response.getStatusCode());
+			Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 			
 			Mockito.when(service.getByProductId(productId)).thenReturn(null);
 			ResponseEntity<Object> response1 = productController.getOrderPathVar(productId);
-			Assert.assertEquals(HttpStatus.NOT_FOUND, response1.getStatusCode());
+			Assertions.assertEquals(HttpStatus.NOT_FOUND, response1.getStatusCode());
 			
 			 Mockito.doThrow(NullPointerException.class).when(service).getByProductId(productId);
 			 ResponseEntity<Object> response2 = productController.getOrderPathVar(productId);
